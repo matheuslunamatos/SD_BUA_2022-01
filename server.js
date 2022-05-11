@@ -20,16 +20,18 @@ const server = http.createServer(app);
 server.listen(3000);
 console.log("O servidor esta rodando na porta " + porta);
 
+const id = 0;
+
 const clientes = [
   {
-    id_cliente: 0,
+    id: 1,
     nome: "João da silva",
     data_nasci: "22/05/1964",
     celular: "(11) 99888-0987",
     email: "joao@mailinator.com",
   },
   {
-    id: 1,
+    id: 3,
     nome: "Maria Joana",
     data_nasci: "30/07/1999",
     celular: "(11) 99488-0987",
@@ -79,7 +81,7 @@ const agenda = [
 //6° Tratar as requisições HTTP do tipo POST---------------------------------------------------
 app.post("/cliente", (req, res, next) => {
   const cliente = {
-    id: (id += 1),
+    id: id + 3,
     nome: req.body.nome,
     data_nasci: req.body.data_nasci,
     celular: req.body.celular,
@@ -89,32 +91,58 @@ app.post("/cliente", (req, res, next) => {
   res.status(200).json(clientes);
 });
 
-//7° Tratar as requisições HTTP do tipo GET----------------------------------------------------
+//exibe as datas/horarios disponiveis
 app.get("/agenda", (req, res, next) => {
   res.status(200).json(agenda);
 });
 
-app.get("/agenda/:id", (req, res, next) => {
+//cria reserva
+app.post("/reserva/:id", (req, res, next) => {
+  console.log("HELPPPPPP");
   const idAgenda = req.params.id;
+  const cliente_id = req.body.id_cliente;
 
-  console.log("ID AGENDA", idAgenda);
+  async function getClient() {
+    clientes.forEach((item) => {
+      if (item.id === cliente_id) {
+        console.log("ITEMEEMEME", item);
+        return item;
+      }
+    });
+  }
+
+  getClient(cliente_id);
+
+  console.log("DADOSSSSS", dados_cliente);
+  console.log("DADOSSSSS", dados_cliente);
+  console.log("DADOSSSSS", dados_cliente);
+  console.log("DADOSSSSS", dados_cliente);
+  console.log("DADOSSSSS", dados_cliente);
+  console.log("DADOSSSSS", dados_cliente);
 
   agenda.forEach((item) => {
     const disponibilidade = item.disponibilidade;
 
+    console.log("DISPONIBILIDADE", disponibilidade);
+
     if (item.id_agenda == idAgenda && disponibilidade > 0) {
-      item.disponibilidade = disponibilidade - 1
-      console.log("Como ficou:::::::", item);
-      res.status(200).json(agenda);
+      item.disponibilidade = disponibilidade - 1;
+
+      const reservation = {
+        id_reserva: idAgenda + 1455,
+        id_cliente: cliente_id,
+        nome_cliente: dados_cliente.name,
+        data_nasci: dados_cliente.data_nasci,
+        email: dados_cliente.email,
+        celular: dados_cliente.celular,
+        data_reserva: item.data,
+        hora_reserva: item.hora,
+        disponibilidade: item.disponibilidade,
+      };
+
+      console.log("RESERVA", reservation);
+
+      res.status(200).json(reservation);
     }
   });
-});
-
-app.post("/reserva", (req, res, next) => {
-  const reserva = {
-    id_reserva: req.body.id_agenda + 1,
-    nome_cliente: req.body.nome,
-    id_agenda: req.body.id_agenda,
-    disponibilidade: req.body.disponibilidade,
-  };
 });
